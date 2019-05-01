@@ -1,0 +1,40 @@
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: docker
+  pull: default
+  image: plugins/docker:latest
+  settings:
+    file: Dockerfile
+    force_tag: true
+    repo: joshdvir/promptr
+    tag:
+    - "${DRONE_BUILD_NUMBER}"
+    - latest
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker-password
+    DOCKER_USERNAME:
+      from_secret: docker-username
+  when:
+    branch:
+    - master
+
+---
+kind: secret
+name: docker-password
+get:
+  path: drone/data/dockerhub
+  name: password
+
+---
+kind: secret
+name: docker-username
+get:
+  path: drone/data/dockerhub
+  name: username
